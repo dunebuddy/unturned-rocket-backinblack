@@ -11,7 +11,7 @@ namespace Dune.Unturned.Rocket.BackInBlack
     {
         public bool Enabled { get; set; }
         public bool TimeLimitEnabled { get; set; }
-        public TimeSpan TimeLimit { get; set; }
+        public int TimeLimit { get; set; }
 
         public IRocketPluginConfiguration DefaultConfiguration
         {
@@ -21,7 +21,7 @@ namespace Dune.Unturned.Rocket.BackInBlack
                     {
                         Enabled = true,
                         TimeLimitEnabled = true,
-                        TimeLimit = TimeSpan.FromSeconds(60)
+                        TimeLimit = 60
                     };
             }
         }

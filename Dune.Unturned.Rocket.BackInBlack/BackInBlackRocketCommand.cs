@@ -41,7 +41,7 @@ namespace Dune.Unturned.Rocket.BackInBlack
             if (command.Length == 0)
             {
                 if (caller != null)
-                    BackInBlack.Instance.TrySendBack(caller);
+                    BackInBlackRocketPlugin.Instance.TrySendBack(caller);
             }
             else
             {
@@ -51,14 +51,14 @@ namespace Dune.Unturned.Rocket.BackInBlack
                 {
                     case "enable":
                     case "on":
-                        ForAdiminsOnly(caller, () => { BackInBlack.Instance.Enable(); });
+                        ForAdiminsOnly(caller, (z) => { BackInBlackRocketPlugin.Instance.Enable(); });
                         break;
                     case "disable":
                     case "off":
-                        ForAdiminsOnly(caller, () => { BackInBlack.Instance.Disable(); });
+                        ForAdiminsOnly(caller, (z) => { BackInBlackRocketPlugin.Instance.Disable(); });
                         break;
                     case "status":
-                        BackInBlack.Instance.Say(caller, string.Format("is {0}", BackInBlack.Instance.Configuration.Enabled ? "Enabled" : "Disabled"));
+                        BackInBlackRocketPlugin.Instance.Say(caller, string.Format("is {0}", BackInBlackRocketPlugin.Instance.Configuration.Enabled ? "Enabled" : "Disabled"));
                         break;
                     case "timelimit":
                         if (command.Length == 2)
@@ -69,17 +69,17 @@ namespace Dune.Unturned.Rocket.BackInBlack
                             {
                                 case "enable":
                                 case "on":
-                                    ForAdiminsOnly(caller, () => { BackInBlack.Instance.EnableTimeLimit(); });
+                                    ForAdiminsOnly(caller, (z) => { BackInBlackRocketPlugin.Instance.EnableTimeLimit(); });
                                     break;
                                 case "disable":
                                 case "off":
-                                    ForAdiminsOnly(caller, () => { BackInBlack.Instance.DisableTimeLimit(); });
+                                    ForAdiminsOnly(caller, (z) => { BackInBlackRocketPlugin.Instance.DisableTimeLimit(); });
                                     break;
                                 case "status":
-                                    BackInBlack.Instance.Say(caller, string.Format("Time Limit is {0}.", BackInBlack.Instance.Configuration.TimeLimitEnabled ? "Enabled" : "Disabled"));
-                                                                        
-                                    if (BackInBlack.Instance.Configuration.TimeLimitEnabled)
-                                        BackInBlack.Instance.Say(caller, string.Format("You will have {0} seconds after each death. Better hurry :)", BackInBlack.Instance.Configuration.TimeLimit.TotalSeconds));
+                                    BackInBlackRocketPlugin.Instance.Say(caller, string.Format("Time Limit is {0}.", BackInBlackRocketPlugin.Instance.Configuration.TimeLimitEnabled ? "Enabled" : "Disabled"));
+
+                                    if (BackInBlackRocketPlugin.Instance.Configuration.TimeLimitEnabled)
+                                        BackInBlackRocketPlugin.Instance.Say(caller, string.Format("You will have {0} seconds after each death. Better hurry :)", BackInBlackRocketPlugin.Instance.Configuration.TimeLimit));
 
                                     break;
                                 default:
@@ -94,11 +94,10 @@ namespace Dune.Unturned.Rocket.BackInBlack
 
                             if (int.TryParse(command[2].ToLower(), out value))
                             {
-
                                 switch (argument)
                                 {
                                     case "set":
-                                        ForAdiminsOnly(caller, () => { BackInBlack.Instance.SetTimeLimit(value); });
+                                        ForAdiminsOnly(caller, (z) => { BackInBlackRocketPlugin.Instance.SetTimeLimit(value); });
                                         break;
                                     default:
                                         BadCommand(caller);
@@ -123,12 +122,7 @@ namespace Dune.Unturned.Rocket.BackInBlack
 
         private void BadCommand(global::Rocket.Unturned.Player.RocketPlayer caller)
         {
-            const string message = "Bad command.";
-
-            if (caller != null)
-                BackInBlack.Instance.Say(caller, message, Color.red);
-            else
-                RocketConsole.print(message);
+            BackInBlackRocketPlugin.Instance.Say(caller, "Bad command.", Color.red);
         }
 
         private void SendHelp(global::Rocket.Unturned.Player.RocketPlayer caller)
@@ -152,36 +146,19 @@ namespace Dune.Unturned.Rocket.BackInBlack
 
             List<string> helpLines = new List<string>(everyOneHelpLines);
 
-            if (caller.IsAdmin)
+            if ((caller == null) || (caller.IsAdmin))
                 helpLines.AddRange(adminsHelpLines);
 
             foreach (string l in helpLines)
-            {
-                if (caller != null)
-                    BackInBlack.Instance.Say(caller, l, Color.red);
-                else
-                    RocketConsole.print(l);
-            }
+                BackInBlackRocketPlugin.Instance.Say(caller, l, Color.red);
         }
 
-        private void ForAdiminsOnly(global::Rocket.Unturned.Player.RocketPlayer caller, Action command)
+        private void ForAdiminsOnly(global::Rocket.Unturned.Player.RocketPlayer caller, Action<int> command)
         {
-            if (caller.IsAdmin)
-                command.Invoke();
+            if ((caller == null) || (caller.IsAdmin))
+                command(default(int));
             else
-                BackInBlack.Instance.Say(caller, "For Admins only, sorry =/");
-        }
-
-        private T ForAdiminsOnly<T>(global::Rocket.Unturned.Player.RocketPlayer caller, Func<T> command)
-        {
-            T result = default(T);
-
-            if (caller.IsAdmin)
-                result = command.Invoke();
-            else
-                BackInBlack.Instance.Say(caller, "For Admins only, sorry =/");
-
-            return result;
+                BackInBlackRocketPlugin.Instance.Say(caller, "For Admins only, sorry =/");
         }
     }
 }

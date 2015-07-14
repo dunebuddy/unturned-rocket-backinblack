@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Dune.Unturned.Rocket.BackInBlack
 {
-    internal class DeathNote
+    public class DeathNote
     {
         public Vector3 Position { get; set; }
         public DateTime TimeOfDeath { get; set; }

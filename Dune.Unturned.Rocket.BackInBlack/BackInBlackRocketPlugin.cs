@@ -10,11 +10,11 @@ using UnityEngine;
 
 namespace Dune.Unturned.Rocket.BackInBlack
 {
-    public class BackInBlack : RocketPlugin<BackInBlackRocketPluginConfiguration>
+    public class BackInBlackRocketPlugin : RocketPlugin<BackInBlackRocketPluginConfiguration>
     {
         private IDictionary<string, DeathNote> deathNotes;
 
-        public static BackInBlack Instance { get; private set; }
+        public static BackInBlackRocketPlugin Instance { get; private set; }
 
         protected override void Load()
         {
@@ -67,14 +67,14 @@ namespace Dune.Unturned.Rocket.BackInBlack
         {
             Configuration.Enabled = true;
 
-            BackInBlack.Instance.Say("is Enabled!");
+            BackInBlackRocketPlugin.Instance.Say("is Enabled!");
         }
 
         internal void Disable()
         {
             Configuration.Enabled = false;
 
-            BackInBlack.Instance.Say("Disabled!", Color.red);
+            BackInBlackRocketPlugin.Instance.Say("Disabled!", Color.red);
 
             // Clearing all deap positions;
             deathNotes.Clear();
@@ -84,21 +84,21 @@ namespace Dune.Unturned.Rocket.BackInBlack
         {
             Configuration.TimeLimitEnabled = true;
 
-            BackInBlack.Instance.Say("Time limit ON, we have no time to cry for the dead!");
+            BackInBlackRocketPlugin.Instance.Say("Time limit ON, we have no time to cry for the dead!");
         }
 
         internal void DisableTimeLimit()
         {
             Configuration.TimeLimitEnabled = false;
 
-            BackInBlack.Instance.Say("No time limitations anymore!");
+            BackInBlackRocketPlugin.Instance.Say("No time limitations anymore!");
         }
 
         internal void SetTimeLimit(int value)
         {
-            Configuration.TimeLimit = TimeSpan.FromSeconds(value);
+            Configuration.TimeLimit = value;
 
-            BackInBlack.Instance.Say(string.Format("Time limit set to {0} seconds. Hurry guys!", value), Color.red);
+            BackInBlackRocketPlugin.Instance.Say(string.Format("Time limit set to {0} seconds. Hurry guys!", value), Color.red);
         }
 
         internal void TrySendBack(global::Rocket.Unturned.Player.RocketPlayer player)
@@ -110,7 +110,7 @@ namespace Dune.Unturned.Rocket.BackInBlack
             {
                 DeathNote deathNote = deathNotes[player.SteamName];
 
-                if (DateTime.Now <= deathNote.TimeOfDeath.Add(Configuration.TimeLimit))
+                if (DateTime.Now <= deathNote.TimeOfDeath.AddSeconds(Configuration.TimeLimit))
                 {
                     // Teleporting the player back.
                     player.Teleport(deathNote.Position, player.Rotation);
@@ -119,7 +119,7 @@ namespace Dune.Unturned.Rocket.BackInBlack
                     Say(player, "Back In Black!");
                 }
                 else
-                    Say(player, "too slow, too bad. ¬¬ XD");
+                    Say(player, "too slow, have a nice walk. XD");
 
                 // Removing the reference, we dont want a smart player using our plugin as fast travel.
                 deathNotes.Remove(player.SteamName);
